@@ -59,7 +59,7 @@ public class DESProgram
 
     private static String processLine(String line, String plainText) throws IllegalStateException
     {
-
+        Boolean ended = false;
         int count = -1;
         String temp = "";
         while (count < line.length())
@@ -75,12 +75,24 @@ public class DESProgram
                 }
                 else
                 {
-                    temp += "00000000";
+                    if(i ==8)
+                    {
+                        temp += "00001010";
+                        ended = true;
+                    }
+                    else
+                    {
+                        temp += "00000000";
+                    }
                 }
             }
         }
+        if(!ended)
+        {
+            temp += "0000000000000000000000000000000000000000000000000000000000101010";
+        }
 
-        plainText += temp + charToBin('\n');
+        plainText += temp;
         System.out.println(plainText);
 
         return plainText;
