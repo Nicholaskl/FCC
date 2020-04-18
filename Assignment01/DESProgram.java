@@ -21,8 +21,8 @@ public class DESProgram
         //System.out.println("encrypted: " + des1.encrypt(plaintext)); //85e813540f0ab405
         //System.out.println("decrypted: " + des1.decrypt("85e813540f0ab405"));
         //System.out.println("decrypted: " + des1.decrypt("9FFEC45C707B32D9"));
-        //writeOneRow("outputE" + formattedDate, readFile("test", des1, true));
-        writeOneRow("outputD" + formattedDate, readFile("output", des1, false)); 
+        //writeOneRow("output3", readFile("testfile-DES.txt", des1, true));
+        writeOneRow("outputD" + formattedDate, readFile("output3", des1, false)); 
     }
 
     private static String readFile(String inFilename, DES des1, Boolean doEncrypt)
@@ -40,7 +40,7 @@ public class DESProgram
             bufRdr = new BufferedReader(rdr);
 
             line = bufRdr.readLine();
-            while (line != null && !(line.equals("")))
+            while (line != null)
             {
                 plainText = processLine(line, plainText, des1, doEncrypt);
                 line = bufRdr.readLine();
@@ -83,19 +83,20 @@ public class DESProgram
     {
         Boolean ended = false;
         int count = -1;
-        String temp = "";
-        while (count < line.length()-1)
+        String temp;
+
+        for(int i=0; i < (int)Math.ceil(line.length()/8.0); i++)
         {
-            for(int i= 1; i < 9; i++)
+            temp = "";
+            for(int j=0; j < 8; j++)
             {
-                count += 1;
-                if(count < line.length())
+                if((i*8+j) < line.length())
                 {
-                    temp += charToHex(line.charAt(count));
+                    temp += charToHex(line.charAt(i*8+j));
                 }
                 else
                 {
-                    if(i == 8)
+                    if(j == 7)
                     {
                         temp += "0A";
                         ended = true;
@@ -110,10 +111,10 @@ public class DESProgram
         }
         if(!ended)
         {
-            System.out.println("WOAH");
             temp = "000000000000000A";
             plainText += des1.encrypt(temp);
         }
+
         return plainText  + '\n';
     }
 
@@ -149,7 +150,7 @@ public class DESProgram
             fileStrm = new FileOutputStream(filename);
             pw = new PrintWriter(fileStrm);
 
-            pw.print(output);
+            pw.print(output.replaceAll("[\u0000]",""));
 
             pw.close();
         }
