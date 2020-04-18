@@ -84,7 +84,7 @@ public class DESProgram
         Boolean ended = false;
         int count = -1;
         String temp = "";
-        while (count < line.length())
+        while (count < line.length()-1)
         {
             for(int i= 1; i < 9; i++)
             {
@@ -106,14 +106,15 @@ public class DESProgram
                     }
                 }
             }
-            plainText += des1.encrypt(temp) + '\n';
+            plainText += des1.encrypt(temp);
         }
         if(!ended)
         {
-            temp += "000000000000000A";
-            plainText += des1.encrypt(temp) + '\n';
+            System.out.println("WOAH");
+            temp = "000000000000000A";
+            plainText += des1.encrypt(temp);
         }
-        return plainText;
+        return plainText  + '\n';
     }
 
     private static String processDecrypt(String line, String ciphertext, DES des1)
@@ -125,7 +126,6 @@ public class DESProgram
             temp = "";
             for(int j = 0; j < 16; j++)
             {
-                System.out.println(i + ", " + j);
                 temp += line.charAt(i*16+j);
             }
             temp = des1.decrypt(temp);
