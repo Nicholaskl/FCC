@@ -1,10 +1,8 @@
 import java.io.*;
 import java.util.*;
 
-public class Question1
+public class Affine
 {
-   private static final int C_VALUE = 3;
-
     public static void main(String[] args)
     {
         String fileName = "";
@@ -12,9 +10,9 @@ public class Question1
         String inputText = "";
         String outputGraph = "";
         
-        if(args.length != 2)
+        if(args.length != 4)
         {
-            System.out.println("Please use program by java Question1 <fileName> <type>");
+            System.out.println("Please use program by java Question1 <fileName> <type> <a> <b>");
             System.out.println("  Type can be e for encrypt, or d for decrypt!");
         }
         else
@@ -29,11 +27,11 @@ public class Question1
 
                 if(menuType == 'e')
                 {
-                    inputText = EncryptString(inputText);
+                    inputText = EncryptString(inputText, Integer.parseInt(args[2]), Integer.parseInt(args[3]));
                 }
                 else
                 {
-                    inputText = DecryptString(inputText);
+                    inputText = DecryptString(inputText, Integer.parseInt(args[2]), Integer.parseInt(args[3]));
                 }
                 writeOneRow("output", inputText);
             }
@@ -74,7 +72,7 @@ public class Question1
         }
     }
 
-    public static String EncryptString(String plaintext)
+    public static String EncryptString(String plaintext, int a, int b)
     {
         String cipherText = "";
 	    int[] temp = new int[plaintext.length()];
@@ -83,13 +81,11 @@ public class Question1
         {
             if((((int)plaintext.charAt(i)) >= 97) && (((int)plaintext.charAt(i)) <= 122))
             {
-                temp[i] = (int)(plaintext.charAt(i)) - 97;
-                temp[i] = ((temp[i] + C_VALUE) % 26) + 97;
+                temp[i] = Encrypt(plaintext.charAt(i), 97, a, b);
             }
             else if((((int)plaintext.charAt(i)) >= 65) && (((int)plaintext.charAt(i)) <= 90))
             {
-                temp[i] = (int)(plaintext.charAt(i)) - 65;
-                temp[i] = ((temp[i] + C_VALUE) % 26) + 65;
+                temp[i] = Encrypt(plaintext.charAt(i), 65, a, b);
             }
             else
             {
@@ -105,30 +101,39 @@ public class Question1
         return cipherText;
     }
 
-    public static String DecryptString(String plaintext)
+    public static int Encrypt(int currChar, int alphaStart, int a, int b)
+    {
+        int temp;
+        
+        temp = currChar - alphaStart;
+        temp = ((a*temp + b) % 27) + alphaStart;
+
+        return temp;
+    }
+
+    public static String DecryptString(String plaintext, int a, int b)
     {
         String cipherText = "";
-    	int[] temp = new int[plaintext.length()];
+        int[] temp = new int[plaintext.length()];
+        int aInv = 0; //inverse of a
+
+        for(int j=0; j < 27; j++) // find inverse of a
+        {
+            if(((a*j)%27)==1)
+            {
+                aInv = j;
+            }
+        }
 
         for (int i=0; i < plaintext.length(); i++)
         {
-            if((((int)plaintext.charAt(i)) >= 97) && (((int)plaintext.charAt(i)) <= 122))
+            if((((int)plaintext.charAt(i)) >= 97) && (((int)plaintext.charAt(i)) <= 123))
             {
-                temp[i] = (int)(plaintext.charAt(i)) - 97;
-                if ((temp[i]-3) < 0)
-                {
-                    temp[i] = temp[i] + 26;
-                }
-                temp[i] = ((temp[i] - C_VALUE) % 26) + 97;
+                temp[i] = Decrypt(plaintext.charAt(i), 97, aInv, b);
             }
-            else if((((int)plaintext.charAt(i)) >= 65) && (((int)plaintext.charAt(i)) <= 90))
+            else if((((int)plaintext.charAt(i)) >= 65) && (((int)plaintext.charAt(i)) <= 91))
             {
-                temp[i] = (int)(plaintext.charAt(i)) - 65;
-                if ((temp[i]-3) < 0)
-                {
-                    temp[i] = temp[i] + 26;
-                }
-                temp[i] = ((temp[i] - C_VALUE) % 26) + 65;
+                temp[i] = Decrypt(plaintext.charAt(i), 65, aInv, b);
             }
             else
             {
@@ -142,6 +147,16 @@ public class Question1
         }
 
         return cipherText;
+    }
+
+    public static int Decrypt(int currChar,int alphaStart, int aInv, int b)
+    {
+        int temp;
+
+        temp = currChar - alphaStart + 27;
+        temp = (aInv * (temp - b)) % 27 + alphaStart;
+
+        return temp;
     }
 
     private static String readFile(String inFilename)
