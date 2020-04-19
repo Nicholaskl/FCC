@@ -1,3 +1,16 @@
+/*
+ * File: DES.java
+ * File Created: Wednesday, 15th April 2020
+ * Author: Nicholas Klvana-Hooper
+ * -----
+ * Last Modified: Sunday, 29th April 2020
+ * Modified By: Nicholas Klvana-Hooper
+ * -----
+ * Purpose: Implements the DES encryption/decryption algorithm in java using file reading and writing
+ * Reference: DES process based on http://page.math.tu-berlin.de/~kant/teaching/hess/krypto-ws2006/des.htm
+ *            Accessed on the 15th April 2020
+ */
+
 import java.util.*;
 
 public class DES 
@@ -54,11 +67,23 @@ public class DES
 
     private static final int[] IP_I = {40, 8, 48, 16, 56, 24, 64, 32, 39, 7, 47, 15, 55, 23, 63, 31, 38, 6, 46, 14, 54, 22, 62, 30, 37, 5, 45, 13, 53, 21, 61, 29, 36, 4, 44, 12, 52, 20, 60, 28, 35, 3, 43, 11, 51, 19, 59, 27, 34, 2, 42, 10, 50, 18, 58, 26, 33, 1, 41, 9, 49, 17, 57, 25};
 
+    /*
+     * SUBMODULE: DES Default Constructor 
+     * IMPORT:
+     * EXPORT:
+     * ASSERTION: Default Constuctor 
+     */
     public DES()
     {
         key = "";
     }
 
+    /*
+     * SUBMODULE: keyGen
+     * IMPORT: inKey(String)
+     * EXPORT: 
+     * ASSERTION: Generates keys from imported key
+     */
     public void keyGen(String inKey)
     {
         String left, right;
@@ -66,19 +91,19 @@ public class DES
         String[] c = new String[16];
         String[] d = new String[16];
 
-        key = hexToBin(inKey.toUpperCase());
-        for(int i=0; i < (64-key.length()); i++)
+        key = hexToBin(inKey.toUpperCase()); //converts character key to hex
+        for(int i=0; i < (64-key.length()); i++) //pads the end of key with 0s
         {
             temp += "0";
         }
-        key = temp + key;
-        key = permutate(key, PC1);
-        left = key.substring(0, (key.length()/2));
+        key = temp + key; //adds padding to key
+        key = permutate(key, PC1); //Original permutation
+        left = key.substring(0, (key.length()/2)); //splits key into left and right
         right = key.substring(key.length()/2);
         
-        for(int i=0; i < 16; i++)
+        for(int i=0; i < 16; i++) //16 iterations of shifting the left and right
         {
-            if(i == 0)
+            if(i == 0) //original shift is based on the original left and right
             {
                 c[0] = leftShift(left, L_SHIFT[0]);
                 d[0] = leftShift(right, L_SHIFT[0]);
@@ -92,6 +117,12 @@ public class DES
         }
     }
 
+    /*
+     * SUBMODULE: encrypt
+     * IMPORT: plaintext(String)
+     * EXPORT: ciphertext(String)
+     * ASSERTION: Encrypts plaintext with key
+     */
     public String encrypt(String plaintext)
     {
         String ciphertext = "";
@@ -110,11 +141,17 @@ public class DES
             right = xor(rightFunc(right, i), prevLeft); //xor previous left with right function
         }
         ciphertext = permutate(right + left, IP_I); //final permutation, flip left and right
-        ciphertext = binToHex(ciphertext);
+        ciphertext = binToHex(ciphertext); //convert binary to hex
 
         return ciphertext.toUpperCase();
     }
 
+     /*
+     * SUBMODULE: decrypt
+     * IMPORT: ciphertext(String)
+     * EXPORT: plaintext(String)
+     * ASSERTION: Decrypts ciphertext with key
+     */
     public String decrypt(String ciphertext)
     {
         String plaintext = "";
@@ -133,42 +170,53 @@ public class DES
             right = xor(rightFunc(right, i), prevLeft); //xor previous left with right function
         }
         plaintext = permutate(right + left, IP_I); //final permutation, flip left and right
-        plaintext = binToHex(plaintext);
+        plaintext = binToHex(plaintext); //converts binary to hex
 
-        return plaintext.toUpperCase();
+        return plaintext.toUpperCase(); //ensures uppercase for hex
     }
 
+    /*
+     * SUBMODULE: rightFunc
+     * IMPORT: right(String), i(int)
+     * EXPORT: right(String)
+     * ASSERTION: Generates keys from imported key
+     */
     private String rightFunc(String right, int i)
     {
         String temp, tempRight;
         int row, col;
 
-        right = permutate(right, E);
+        right = permutate(right, E); //original permutation of right side
         right = xor(right, keys[i]); //xor the key and permutated right
 
         tempRight = ""; //resets to blank
         
-        //7 S_Box permutations
+        //8 S_Box permutations
         for(int j=0; j < 8; j++)
         {
-            temp = "" + right.charAt(j*6) + right.charAt(j*6+5);
-            row = binToDec(temp);
-            temp = "" + right.charAt(j*6+1) + right.charAt(j*6+2) + right.charAt(j*6+3) + right.charAt(j*6+4);
+            temp = "" + right.charAt(j*6) + right.charAt(j*6+5); //row is based off first and last bits in String
+            row = binToDec(temp); 
+            temp = "" + right.charAt(j*6+1) + right.charAt(j*6+2) + right.charAt(j*6+3) + right.charAt(j*6+4); //column is based off the rest of the bits
             col = binToDec(temp);
-            tempRight += decToBin(S[j][row][col]);
+            tempRight += decToBin(S[j][row][col]); //get binary of the S_box entries
         }
-        right = tempRight;
-        right = permutate(right, P); //Final permutation on right side
+        right = permutate(tempRight, P); //Final permutation on right side
 
         return right;
     }
 
+    /*
+     * SUBMODULE: hexToBin
+     * IMPORT: inKey(String)
+     * EXPORT: tempKey(String)
+     * ASSERTION: Converts hexadecimal to binary
+     */
     public String hexToBin(String inKey)
     {
         int tempChar = 0;
         String tempKey = "";
 
-        for(int i=1; i <= inKey.length(); i++)
+        for(int i=1; i <= inKey.length(); i++) //go through string length
         {
             tempChar = (int)inKey.charAt(i-1); //Gets next character in key entered
 
@@ -182,7 +230,7 @@ public class DES
                 tempChar -= 48;
             }
 
-            for(int j=3; j >= 0; j--)
+            for(int j=3; j >= 0; j--) //hexadecmial is based off 4 binary
             {
                 if(tempChar >= Math.pow(2,j))
                 {
@@ -198,34 +246,46 @@ public class DES
         return tempKey;
     }
 
+    /*
+     * SUBMODULE: binToHex
+     * IMPORT: binary(String)
+     * EXPORT: hex(String)
+     * ASSERTION: converts binary to hex
+     */
     public String binToHex(String binary)
     {
         String hex = "";
         int dec;
 
-        for(int i=0; i < (binary.length()/4); i++)
+        for(int i=0; i < (binary.length()/4); i++) //traverses binary string in 4 bit blocks
         {
             dec = 0;
-            for(int j=0; j < 4; j++)
+            for(int j=0; j < 4; j++) //traverses 4 bit blocks
             {
-                if(binary.charAt(4*i+j) == '1')
+                if(binary.charAt(4*i+j) == '1') //if 1 adds the value from binary
                 {
                     dec += Math.pow(2, 3-j);
                 }
             }
-            hex += Integer.toHexString(dec);
+            hex += Integer.toHexString(dec); //converts binary to hex
         }
 
         return hex;
     }
 
+    /*
+     * SUBMODULE: binToDec
+     * IMPORT: binary(String)
+     * EXPORT: dec(int)
+     * ASSERTION: converts binary to decimal
+     */
     public int binToDec(String binary)
     {
         int dec = 0;
 
-        for(int i=0; i < binary.length(); i++)
+        for(int i=0; i < binary.length(); i++) //iterates binary string
         {
-            if(binary.charAt(i) == '1')
+            if(binary.charAt(i) == '1') //if one adds 2^ current location
             {
                 dec += Math.pow(2, binary.length()-i-1);
             }
@@ -234,11 +294,17 @@ public class DES
         return dec;
     }
 
+    /*
+     * SUBMODULE: decToBin
+     * IMPORT: dec(int)
+     * EXPORT: output(String)
+     * ASSERTION: Convets decimal to binary
+     */
     public String decToBin(int dec)
     {
         String output = "";
 
-        for(int i=3; i >= 0; i--)
+        for(int i=3; i >= 0; i--) //makes 4 bit binary
         {
             if(dec >= Math.pow(2, i))
             {
@@ -254,51 +320,61 @@ public class DES
         return output;
     }
 
+    /*
+     * SUBMODULE: permutate
+     * IMPORT: text(String) arr(int[])
+     * EXPORT: temp(String)
+     * ASSERTION: Permutatetes text based on value in array
+     */
     private String permutate(String text, int[] arr)
     {
         String temp = "";
         
-        for(int i=0; i < arr.length; i++)
+        for(int i=0; i < arr.length; i++) //goes through array and chooses specified bit
         {
             temp += text.charAt(arr[i]-1);
         }
         return temp;
     }
 
-    private String leftShift(String currKey, int numShift) //RETURN STRING
+    /*
+     * SUBMODULE: leftShift
+     * IMPORT: currKey(String), numShift(int)
+     * EXPORT: left shifted text(String)
+     * ASSERTION: Left shifts the binary string by given number
+     */
+    private String leftShift(String currKey, int numShift)
     {
-        int[] shiftBy = new int[currKey.length()];
-        for(int i=1; i <= shiftBy.length; i++)
+        int[] shiftBy = new int[currKey.length()]; //create array to enter permutation array
+        for(int i=1; i <= shiftBy.length; i++) //enter values to new location value of permutated array
         {
-            if((i+numShift) > currKey.length())
+            if((i+numShift) > currKey.length()) //if new value is above length of string mod it to bring it back to 0
             {
                 shiftBy[i-1] = (i+numShift)%currKey.length();
             }
             else
             {
-                shiftBy[i-1] = (i+numShift);
+                shiftBy[i-1] = (i+numShift); //otherwise just change value
             }
         }
-        return permutate(currKey, shiftBy);
+        return permutate(currKey, shiftBy); //now use array to permutate the array to left shift the data
     }
 
+    /*
+     * SUBMODULE: xor
+     * IMPORT: one(String), two(String)
+     * EXPORT: output(String)
+     * ASSERTION: does a xor operation using the two strings
+     */
     public String xor(String one, String two)
     {
         String output = "";
 
-        for (int i=0; i < one.length(); i++)
+        for (int i=0; i < one.length(); i++) //go through bit by bit
         {
-            output += ((int)one.charAt(i) + (int)two.charAt(i)) % 2;
+            output += ((int)one.charAt(i) + (int)two.charAt(i)) % 2; //do xor operation
         }
 
         return output;
-    }
-
-    public void printKeys()
-    {
-        for(int i=0; i < keys.length; i++)
-        {
-            System.out.println(i+1 + ": " + keys[i]);
-        }
     }
 }

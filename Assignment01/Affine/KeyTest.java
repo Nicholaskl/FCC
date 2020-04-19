@@ -1,10 +1,21 @@
+/*
+ * File: KeyTest.java
+ * File Created: Tuesday, 14th April 2020
+ * Author: Nicholas Klvana-Hooper
+ * -----
+ * Last Modified: Sunday, 29th April 2020
+ * Modified By: Nicholas Klvana-Hooper
+ * -----
+ * Purpose: To determine if two keys are suitable for affine cipher encryption
+ * Reference:
+ */
 import java.util.*;
 
 public class KeyTest
 {
     public static void main(String[] args) 
     {
-        if(args.length != 2)
+        if(args.length != 2) //Program needs two values to run if not print help dialogue
         {
             System.out.println("Please use program by java Question1 <a> <b>");
             System.out.println("  where a and b are the two keys you want to test");
@@ -13,13 +24,13 @@ public class KeyTest
         {
             try
             {
-                if((Integer.parseInt(args[0]) > 0) && (Integer.parseInt(args[0]) < 27))
+                if((Integer.parseInt(args[0]) > 0) && (Integer.parseInt(args[0]) < 27)) //checks if a is between 1 and 26
                 {
-                    if(coPrime(Integer.parseInt(args[0]), 27) == 1)
+                    if(coPrime(Integer.parseInt(args[0]), 27) == 1) //if a is coprime with 27 it is appropriate
                     {
                         System.out.println("a is an appropriate key");
                     }
-                    else
+                    else //otherwise not
                     {
                         System.out.println("a is NOT appropriate key");
                     }
@@ -29,9 +40,9 @@ public class KeyTest
                     System.out.println("a is NOT appropriate key");
                 }
 
-                if((Integer.parseInt(args[1]) > 0) && (Integer.parseInt(args[1]) < 27))
+                if((Integer.parseInt(args[1]) > 0) && (Integer.parseInt(args[1]) < 27))//checks if b is between 1 and 26
                 {
-                    System.out.println("b is an appropriate key");
+                    System.out.println("b is an appropriate key"); //if it is, it is appropriate key
                 }
                 else
                 {
@@ -45,6 +56,12 @@ public class KeyTest
         }
     }
 
+    /*
+     * SUBMODULE: coPrime
+     * IMPORT: a (int), b(int)
+     * EXPORT: greatestFactor(int)
+     * ASSERTION: Checks whether two numbers are coprime
+     */
     private static int coPrime(int a, int b)
     {
         int greatestFactor = 0;
@@ -55,13 +72,13 @@ public class KeyTest
         }
         else if(a > b)
         {
-            greatestFactor = coPrime(a-b, b);
+            greatestFactor = coPrime(a-b, b); //if a is bigger than check smaller potential factor
         }
         else if(a < b)
         {
-            greatestFactor = coPrime(a, b-a);
+            greatestFactor = coPrime(a, b-a);//if b is bigger than check smaller potential factor
         }
-        else if(a == b)
+        else if(a == b) //a is the largest common factor
         {
             greatestFactor = a;
         }
