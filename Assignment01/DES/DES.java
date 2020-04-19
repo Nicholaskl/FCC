@@ -128,6 +128,7 @@ public class DES
         String ciphertext = "";
         String left, right, prevLeft;
 
+        keyGen("0000000000000000");
         ciphertext = hexToBin(plaintext.toUpperCase());
         ciphertext = permutate(ciphertext, IP); //Original Permutation
         left = ciphertext.substring(0, 32); //Split into left
@@ -140,7 +141,7 @@ public class DES
             left = right; //left equals previous right
             right = xor(rightFunc(right, i), prevLeft); //xor previous left with right function
         }
-        ciphertext = permutate(right + left, IP_I); //final permutation, flip left and right
+        ciphertext = permutate(switchS(right, left), IP_I); //final permutation, flip left and right
         ciphertext = binToHex(ciphertext); //convert binary to hex
 
         return ciphertext.toUpperCase();
@@ -157,6 +158,7 @@ public class DES
         String plaintext = "";
         String left, right, prevLeft;
 
+        keyGen("0000000000000000");
         plaintext = hexToBin(ciphertext.toUpperCase());
         plaintext = permutate(plaintext, IP); //Original Permutation
         left = plaintext.substring(0, 32); //Split into left
@@ -169,10 +171,21 @@ public class DES
             left = right; //left equals previous right
             right = xor(rightFunc(right, i), prevLeft); //xor previous left with right function
         }
-        plaintext = permutate(right + left, IP_I); //final permutation, flip left and right
+        plaintext = permutate(switchS(right, left), IP_I); //final permutation, flip left and right
         plaintext = binToHex(plaintext); //converts binary to hex
 
         return plaintext.toUpperCase(); //ensures uppercase for hex
+    }
+
+    /*
+     * SUBMODULE: switchS
+     * IMPORT: right(String), left(String)
+     * EXPORT: right+left(String)
+     * ASSERTION: Switches so left is on the right.
+     */
+    private String switchS(String right, String left)
+    {
+        return right + left;
     }
 
     /*

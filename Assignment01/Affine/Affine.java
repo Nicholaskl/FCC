@@ -272,7 +272,7 @@ public class Affine
     {
         try
         {
-            plainText += line;
+            plainText += line + "\n";
         }
         catch(Exception e)
         {
