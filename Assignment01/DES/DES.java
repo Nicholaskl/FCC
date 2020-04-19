@@ -127,8 +127,7 @@ public class DES
     {
         String ciphertext = "";
         String left, right, prevLeft;
-
-        keyGen("0000000000000000");
+        
         ciphertext = hexToBin(plaintext.toUpperCase());
         ciphertext = permutate(ciphertext, IP); //Original Permutation
         left = ciphertext.substring(0, 32); //Split into left
@@ -158,7 +157,6 @@ public class DES
         String plaintext = "";
         String left, right, prevLeft;
 
-        keyGen("0000000000000000");
         plaintext = hexToBin(ciphertext.toUpperCase());
         plaintext = permutate(plaintext, IP); //Original Permutation
         left = plaintext.substring(0, 32); //Split into left

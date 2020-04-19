@@ -37,12 +37,11 @@ public class DESProgram
 
                 if(args[2].charAt(0) == 'e') //if e then encrypt file
                 {
-                    //writeOneRow(args[1], readFile(args[0], des1, true));
                     writeOneRow(args[1], readFile(args[0], des1, true));
                 }
                 else if(args[2].charAt(0) == 'd') //if d then decrypt file
                 {
-                    //writeOneRow(args[1], readFile(args[0], des1, false));
+                    writeOneRow(args[1], readFile(args[0], des1, false));
                 }
                 else //otherwise incorrect character
                 {
