@@ -1,0 +1,7 @@
+For example as pointed out by researcher. For each set of fuzzy terms, $A \subseteq M$, $\prod_{m\in
+A}m$ represents a conjunction of the fuzzy terms in $A$. For
+instance,
+ let $A=\{m_{1,2},m_{2,1},m_{4,2}\}\subseteq M$, a new
+fuzzy concept ``$m_{1,2}$ and $m_{2,1}$ and $m_{4,2}$" with the linguist
+interpretation ``\emph{short sepal and wide sepal and narrow petal}"
+can be represented as $\prod
